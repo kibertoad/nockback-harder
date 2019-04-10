@@ -1,0 +1,8 @@
+.idea/
+.npmignore
+node_modules/
+README.md
+test/
+.nyc_output/
+jest.config.json
+package-lock.json
