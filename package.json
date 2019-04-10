@@ -1,0 +1,7 @@
+{
+  "name": "nockback-harder",
+  "version": "1.0.0",
+  "dependencies": {
+    "nock": "^10.0.6"
+  }
+}
