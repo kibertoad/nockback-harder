@@ -1,6 +1,13 @@
 {
   "name": "nockback-harder",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "license": "MIT",
+  "maintainers": [
+    {
+      "name": "Igor Savin",
+      "email": "kibertoad@gmail.com"
+    }
+  ],
   "scripts": {
     "build": "tsc",
     "test": "jest --config=jest.config.json",
@@ -43,5 +50,14 @@
         "lines": 85
       }
     }
-  }
+  },
+  "homepage": "http://github.com/kibertoad/nockback-harder",
+  "keywords": [
+    "nock",
+    "mock",
+    "mocking",
+    "http",
+    "testing",
+    "nockback"
+  ]
 }
