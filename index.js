@@ -1,4 +1,4 @@
-const NockbackHelper = require('./lib/NockbackHelper')
+const NockbackHelper = require('./dist/lib/NockbackHelper')
 
 module.exports = {
     NockbackHelper
