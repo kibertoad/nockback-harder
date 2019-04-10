@@ -8,7 +8,7 @@ Wrapper that makes testing using nock mock replay functionality sane. Ignores lo
 import { NockbackHelper } from 'nockback-harder/index-ts'
 
   const helper = new NockbackHelper(nock, __dirname + '/nock-fixtures', true)
-  helper.setMode('record')
+  helper.startRecording()
 
   await helper.nockBack('google.com-GET.json', async () => {
     // Will be recorded
@@ -19,7 +19,7 @@ import { NockbackHelper } from 'nockback-harder/index-ts'
     // Will not be recorded
     const responseLocal = await request.get('localhost:4000')
     expect(responseLocal.status).toBe(200)
-    expect(responseLocal.text).toMatchSnapshot()
+    expect(responseLocal.body).toMatchSnapshot()
   })
 ```
 

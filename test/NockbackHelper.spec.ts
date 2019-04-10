@@ -7,7 +7,7 @@ import rimraf from 'rimraf'
 describe('NockbackHelper', () => {
   it('replay', async () => {
     const helper = new NockbackHelper(nock, __dirname + '/nock-fixtures', true)
-    helper.setMode('record')
+    helper.startLockdown()
 
     await helper.nockBack('google.com-GET.json', async () => {
       const response = await request.get('www.google.com')
@@ -19,7 +19,7 @@ describe('NockbackHelper', () => {
   it('bypass local', async () => {
     rimraf.sync(__dirname + '/nock-fixtures/local-GET.json')
     const helper = new NockbackHelper(nock, __dirname + '/nock-fixtures', true)
-    helper.setMode('record')
+    helper.startRecording()
     const app = express()
     // @ts-ignore
     app.get('/', (req: express.Response, res: express.Response) => {

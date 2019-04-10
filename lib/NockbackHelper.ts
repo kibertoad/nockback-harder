@@ -76,6 +76,20 @@ export class NockbackHelper {
   public setMode(mode: NockBackMode) {
     this.mode = mode
   }
+
+  /**
+   * Use recorded fixtures, record missing ones
+   */
+  public startRecording() {
+    this.setMode('record')
+  }
+
+  /**
+   * Use recorded fixtures, throw an error on missing ones, don't record
+   */
+  public startLockdown() {
+    this.setMode('lockdown')
+  }
 }
 
 function localUrlMatcher(url: string): boolean {
