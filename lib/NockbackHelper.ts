@@ -7,7 +7,7 @@ export class NockbackHelper {
   private fixtureDirectory: string | undefined
   private readonly passthroughLocalCall: boolean
 
-  constructor(nock: any, fixtureDirectory?: string, passthroughLocalCall: boolean = true) {
+  public constructor(nock: any, fixtureDirectory?: string, passthroughLocalCall: boolean = true) {
     this.nock = nock
     this._nockBack = nock.back
     this.mode = 'wild'
@@ -22,7 +22,7 @@ export class NockbackHelper {
    * @param {function} callback - can be sync or async
    * @returns {Promise<any>} - value returned by callback
    */
-  nockBack(
+  public nockBack(
     pathToFixture: string,
     optionsOverride: NockBackOptions | Function,
     callback?: Function
@@ -69,11 +69,11 @@ export class NockbackHelper {
     })
   }
 
-  setFixtureDirectory(fixtureDirectory: string) {
+  public setFixtureDirectory(fixtureDirectory: string) {
     this.fixtureDirectory = fixtureDirectory
   }
 
-  setMode(mode: NockBackMode) {
+  public setMode(mode: NockBackMode) {
     this.mode = mode
   }
 }
