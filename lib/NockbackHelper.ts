@@ -43,7 +43,7 @@ export class NockbackHelper {
       // on 'record' I had to filter requests to localhost.
       afterRecord: (outputs: any[]) =>
         outputs.filter(o => {
-          return localUrlMatcher(o.scope)
+          return !localUrlMatcher(o.scope)
         })
     }
 
@@ -93,7 +93,7 @@ export class NockbackHelper {
 }
 
 function localUrlMatcher(url: string): boolean {
-  if (!url.match(/localhost/) && !url.match(/127\.0\.0\.1/)) {
+  if (url.match(/localhost/) || url.match(/127\.0\.0\.1/)) {
     return true
   }
   return false
