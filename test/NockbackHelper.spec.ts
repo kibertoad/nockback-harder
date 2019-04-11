@@ -1,4 +1,4 @@
-import { NockbackHelper } from '../index-ts'
+import { NockbackHelper } from '../index'
 import * as nock from 'nock'
 import request from 'superagent'
 import express from 'express'

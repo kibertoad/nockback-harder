@@ -1,6 +1,6 @@
 {
   "name": "nockback-harder",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "license": "MIT",
   "maintainers": [
     {
@@ -8,6 +8,7 @@
       "email": "kibertoad@gmail.com"
     }
   ],
+  "main": "dist/index.js",
   "scripts": {
     "build": "del dist/ && tsc",
     "test": "jest --config=jest.config.json",
