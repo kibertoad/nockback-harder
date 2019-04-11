@@ -9,7 +9,7 @@
     }
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "del dist/ && tsc",
     "test": "jest --config=jest.config.json",
     "test:coverage": "jest --config=jest.config.json --coverage",
     "test:ci": "npm run eslint && npm run test:coverage",
@@ -28,6 +28,7 @@
     "@types/node": "^10.14.4",
     "@types/rimraf": "^2.0.2",
     "@types/superagent": "^4.1.1",
+    "del-cli": "^1.1.0",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.1.0",
     "eslint-plugin-prettier": "^3.0.1",
