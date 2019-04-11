@@ -5,7 +5,7 @@ Wrapper that makes testing using nock mock replay functionality sane. Ignores lo
 ## Example usage
 
 ```
-import { NockbackHelper } from 'nockback-harder/index-ts'
+import { NockbackHelper } from 'nockback-harder'
 
   const helper = new NockbackHelper(nock, __dirname + '/nock-fixtures', true)
   helper.startRecording()
@@ -23,5 +23,4 @@ import { NockbackHelper } from 'nockback-harder/index-ts'
   })
 ```
 
-  If you want to access Typescript version of a library, call `import { NockbackHelper } from 'nockback-harder/index-ts'`
-  For Javascript version call `const { NockbackHelper } = require('nockback-harder')`
+  For CommonJS version call `const { NockbackHelper } = require('nockback-harder')`
