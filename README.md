@@ -1,11 +1,13 @@
 # nockback-harder
 
-Wrapper that makes testing using nock mock replay functionality sane. Ignores local calls when recording, passes through local calls when replaying.
+Wrapper that makes testing using Nock mock replay functionality easier. 
+Does not create mocks for local calls (localhost/127.0.0.1) when recording, allows and passes through local calls when replaying.
 
 ## Example usage
 
 ```
 import { NockbackHelper } from 'nockback-harder'
+import nock from 'nock'
 
   const helper = new NockbackHelper(nock, __dirname + '/nock-fixtures', true)
   helper.startRecording()

@@ -1,6 +1,6 @@
 {
   "name": "nockback-harder",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "license": "MIT",
   "maintainers": [
     {
@@ -35,7 +35,7 @@
     "eslint-plugin-prettier": "^3.0.1",
     "express": "^4.16.4",
     "jest": "^24.7.1",
-    "prettier": "^1.16.4",
+    "prettier": "^1.17.0",
     "rimraf": "^2.6.3",
     "superagent": "^5.0.2",
     "ts-jest": "^24.0.2",
