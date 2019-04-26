@@ -51,4 +51,47 @@ describe('NockbackHelper', () => {
     const local = require('./nock-fixtures/local-GET.json')
     expect(local).toEqual([])
   })
+
+  it('bypassing local works with lockdown', async () => {
+    const helper = new NockbackHelper(nock, __dirname + '/nock-fixtures', true)
+    helper.startLockdown()
+    const app = express()
+    // @ts-ignore
+    app.get('/', (req: express.Response, res: express.Response) => {
+      res.status(200).send({ status: 'ok' })
+    })
+    const server = app.listen(4000)
+
+    await helper.nockBack('local-GET-lockdown.json', async () => {
+      const response = await request.get('localhost:4000')
+      expect(response.body).toMatchSnapshot()
+    })
+
+    server.close()
+  })
+
+  it('bypassing local works with lockdown and correctly fails on unexpected external calls', async () => {
+    jest.setTimeout(3000000)
+    const helper = new NockbackHelper(nock, __dirname + '/nock-fixtures', true)
+    helper.startLockdown()
+    const app = express()
+    // @ts-ignore
+    app.get('/', (req: express.Response, res: express.Response) => {
+      res.status(200).send({ status: 'ok' })
+    })
+    const server = app.listen(4000)
+
+    try {
+      expect.assertions(1)
+      await helper.nockBack('local-GET-lockdown.json', async () => {
+        await request.get('localhost:4000')
+        // @ts-ignore
+        const response = await request.get('www.microsoft.com')
+      })
+    } catch (err) {
+      expect(err.message).toEqual('Nock: Disallowed net connect for "www.microsoft.com:80/"')
+    } finally {
+      server.close()
+    }
+  })
 })

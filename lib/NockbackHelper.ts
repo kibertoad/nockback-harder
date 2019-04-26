@@ -1,3 +1,5 @@
+import fs from 'fs'
+import path from 'path'
 import { NockBack, NockBackMode, NockBackOptions } from 'nock'
 
 export class NockbackHelper {
@@ -34,6 +36,14 @@ export class NockbackHelper {
       throw new Error('No callback defined!')
     }
 
+    this._nockBack.fixtures = this.fixtureDirectory!
+    this._nockBack.setMode(this.mode)
+
+    const hasExternalCalls = checkIfHasExternalCalls(this.fixtureDirectory || '', pathToFixture)
+    if (!hasExternalCalls) {
+      return this.executeWithoutMocks(callback)
+    }
+
     const DEFAULT_OPTIONS: NockBackOptions = {
       // on 'lockdown' mode, 'after' is called after lockdown disables all net.
       after: () =>
@@ -46,9 +56,6 @@ export class NockbackHelper {
           return !localUrlMatcher(o.scope)
         })
     }
-
-    this._nockBack.fixtures = this.fixtureDirectory!
-    this._nockBack.setMode(this.mode)
 
     return new Promise((resolve, reject) => {
       const options = this.passthroughLocalCall ? DEFAULT_OPTIONS : {}
@@ -90,6 +97,27 @@ export class NockbackHelper {
   public startLockdown() {
     this.setMode('lockdown')
   }
+
+  public expectNoPendingMocks() {
+    if (!this.nock.isDone()) {
+      const errMsg = `There are unmet expectations: ${this.nock.pendingMocks()}`
+      this.nock.cleanAll()
+      throw new Error(errMsg)
+    }
+  }
+
+  public disableExternalCalls() {
+    this.nock.enableNetConnect({
+      test: localUrlMatcher
+    })
+  }
+
+  private async executeWithoutMocks(testFn: Function) {
+    if (this.mode === 'lockdown') {
+      this.disableExternalCalls()
+    }
+    return await testFn()
+  }
 }
 
 function localUrlMatcher(url: string): boolean {
@@ -97,4 +125,23 @@ function localUrlMatcher(url: string): boolean {
     return true
   }
   return false
+}
+
+/**
+ * Returns true if there is no mock or if there are actual calls, returns false only if there is empty mock
+ * @param directory
+ * @param pathToFixture
+ */
+function checkIfHasExternalCalls(directory: string, pathToFixture: string): boolean {
+  const resolvedPath = path.resolve(directory, pathToFixture)
+  if (!fs.existsSync(resolvedPath)) {
+    return true
+  }
+  const mocks = require(resolvedPath)
+
+  if (Array.isArray(mocks) && mocks.length === 0) {
+    return false
+  }
+
+  return true
 }
