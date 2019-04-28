@@ -15,5 +15,10 @@
   "coveragePathIgnorePatterns": [
     "<rootDir>/node_modules/",
     "<rootDir>/coverage/"
-  ]
+  ],
+  "globals": {
+    "ts-jest": {
+      "diagnostics": false
+    }
+  }
 }
