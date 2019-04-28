@@ -1,5 +1,6 @@
 # .travis.yml
 language: node_js
+dist: xenial
 
 node_js:
   - '6'
