@@ -5,6 +5,7 @@ import { NockBack, NockBackMode, NockBackOptions } from 'nock'
 export class NockbackHelper {
   private readonly nock: any
   private readonly _nockBack: NockBack
+  private isOverwriting: boolean
   private mode: NockBackMode
   private fixtureDirectory: string | undefined
   private readonly passthroughLocalCall: boolean
@@ -12,7 +13,8 @@ export class NockbackHelper {
   public constructor(nock: any, fixtureDirectory?: string, passthroughLocalCall: boolean = true) {
     this.nock = nock
     this._nockBack = nock.back
-    this.mode = 'wild'
+    this.mode = 'record'
+    this.isOverwriting = false
     this.fixtureDirectory = fixtureDirectory
     this.passthroughLocalCall = passthroughLocalCall
   }
@@ -51,10 +53,11 @@ export class NockbackHelper {
           test: localUrlMatcher
         }),
       // on 'record' I had to filter requests to localhost.
-      afterRecord: (outputs: any[]) =>
-        outputs.filter(o => {
+      afterRecord: (outputs: any[]) => {
+        return outputs.filter(o => {
           return !localUrlMatcher(o.scope)
         })
+      }
     }
 
     return new Promise((resolve, reject) => {
@@ -62,6 +65,9 @@ export class NockbackHelper {
       const mergedOptions: NockBackOptions = {
         ...options,
         ...optionsOverride
+      }
+      if (this.isOverwriting) {
+        deleteFixture(this.fixtureDirectory || '', pathToFixture)
       }
 
       this._nockBack(pathToFixture, mergedOptions, async (nockDone: Function) => {
@@ -88,6 +94,15 @@ export class NockbackHelper {
    * Use recorded fixtures, record missing ones
    */
   public startRecording() {
+    this.isOverwriting = false
+    this.setMode('record')
+  }
+
+  /**
+   * Record missing fixtures and overwrite existing ones
+   */
+  public startRecordingOverwrite() {
+    this.isOverwriting = true
     this.setMode('record')
   }
 
@@ -95,6 +110,7 @@ export class NockbackHelper {
    * Use recorded fixtures, throw an error on missing ones, don't record
    */
   public startLockdown() {
+    this.isOverwriting = false
     this.setMode('lockdown')
   }
 
@@ -144,4 +160,19 @@ function checkIfHasExternalCalls(directory: string, pathToFixture: string): bool
   }
 
   return true
+}
+
+/**
+ *
+ * @param directory
+ * @param pathToFixture
+ * @return true if fixture was deleted, false if there was no fixture to delete
+ */
+function deleteFixture(directory: string, pathToFixture: string): boolean {
+  const resolvedPath = path.resolve(directory, pathToFixture)
+  if (fs.existsSync(resolvedPath)) {
+    fs.unlinkSync(resolvedPath)
+    return true
+  }
+  return false
 }
