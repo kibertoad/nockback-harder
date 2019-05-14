@@ -10,8 +10,7 @@ export function initHelper(dirname: string, passThroughLocalCall: boolean = true
 
 export function runSimpleApp(): Server {
   const app = express()
-  // @ts-ignore
-  app.get('/', (req: express.Response, res: express.Response) => {
+  app.get('/', (_req: express.Request, res: express.Response) => {
     res.status(200).send({ status: 'ok' })
   })
   return app.listen(4000)
