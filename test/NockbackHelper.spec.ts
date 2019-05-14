@@ -4,16 +4,16 @@ import rimraf from 'rimraf'
 import { initHelper, runSimpleApp, loadJSON, saveJSON } from './utils/testUtils'
 
 describe('NockbackHelper', () => {
-  it('block unmocked external call', async done => {
+  it('block unmocked external call', async () => {
     const helper = initHelper(__dirname)
     helper.startLockdown()
+    expect.hasAssertions()
 
     await helper.nockBack('microsoft.com-GET.json', async () => {
       try {
         await request.get('www.microsoft.com')
       } catch (err) {
         expect(err.message).toMatch('Disallowed net connect')
-        done()
       }
     })
   })
@@ -47,6 +47,32 @@ describe('NockbackHelper', () => {
 
     const [updatedMock] = loadJSON(fixturePath)
     expect(updatedMock.path).toEqual('/?dummy2=value')
+    saveJSON([originalMock], fixturePath)
+  })
+
+  it('does not overwrite existing mocks when doNotOverwrite flag is set', async () => {
+    const fixturePath = getFixturePath('local-GET-do-not-overwrite.json')
+    const helper = initHelper(__dirname, false)
+    helper.startRecordingOverwrite()
+    expect.hasAssertions()
+    const server = runSimpleApp()
+    const [originalMock] = loadJSON(fixturePath)
+    expect(originalMock.path).toEqual('/?dummy=value')
+
+    await helper.nockBack('local-GET-do-not-overwrite.json', { doNotOverwrite: true }, async () => {
+      try {
+        await request.get('localhost:4000').query({
+          dummy2: 'value'
+        })
+      } catch (err) {
+        expect(err.message).toMatch('No match for request')
+      }
+    })
+
+    server.close()
+
+    const [updatedMock] = loadJSON(fixturePath)
+    expect(updatedMock.path).toEqual('/?dummy=value')
     saveJSON([originalMock], fixturePath)
   })
 

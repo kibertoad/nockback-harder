@@ -1,0 +1,1 @@
+[{"scope":"http://localhost:4000","method":"GET","path":"/?dummy=value","body":"","status":200,"response":{"status":"ok"},"rawHeaders":["X-Powered-By","Express","Content-Type","application/json; charset=utf-8","Content-Length","15","ETag","W/\"f-VaSQ4oDUiZblZNAEkkN+sX+q3Sg\"","Date","Sun, 28 Apr 2019 19:56:35 GMT","Connection","close"]}]

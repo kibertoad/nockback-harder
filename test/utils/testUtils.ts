@@ -4,8 +4,8 @@ import * as nock from 'nock'
 import { Server } from 'net'
 import fs from 'fs'
 
-export function initHelper(dirname: string, passthroughLocalCall: boolean = true): NockbackHelper {
-  return new NockbackHelper(nock, dirname + '/nock-fixtures', passthroughLocalCall)
+export function initHelper(dirname: string, passThroughLocalCall: boolean = true): NockbackHelper {
+  return new NockbackHelper(nock, dirname + '/nock-fixtures', { passThroughLocalCall })
 }
 
 export function runSimpleApp(): Server {

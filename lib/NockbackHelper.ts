@@ -2,42 +2,64 @@ import fs from 'fs'
 import path from 'path'
 import { NockBack, NockBackMode, NockBackOptions } from 'nock'
 
+const validate = require('validation-utils')
+
+export declare interface NockbackHelperConfig {
+  passThroughLocalCall: boolean
+}
+
+export declare interface NockbackExecutionConfig {
+  passthroughLocalCall?: boolean
+  doNotOverwrite?: boolean
+  nockOptionsOverride?: NockBackOptions
+}
+
 export class NockbackHelper {
   private readonly nock: any
   private readonly _nockBack: NockBack
   private isOverwriting: boolean
   private mode: NockBackMode
   private fixtureDirectory: string | undefined
-  private readonly passthroughLocalCall: boolean
+  private readonly passThroughLocalCall: boolean
 
-  public constructor(nock: any, fixtureDirectory?: string, passthroughLocalCall: boolean = true) {
+  public constructor(
+    nock: any,
+    fixtureDirectory?: string,
+    config: NockbackHelperConfig = {
+      passThroughLocalCall: true
+    }
+  ) {
     this.nock = nock
-    this._nockBack = nock.back
+    this._nockBack = validate.notNil(nock.back, 'Please pass nock as first parameter')
     this.mode = 'record'
     this.isOverwriting = false
     this.fixtureDirectory = fixtureDirectory
-    this.passthroughLocalCall = passthroughLocalCall
+    this.passThroughLocalCall = config.passThroughLocalCall
   }
 
   /**
    *
    * @param {string} pathToFixture
-   * @param {object|function} optionsOverride - options or callback
+   * @param {NockbackExecutionConfig|function} callbackOrConfig - options or callback
    * @param {function} callback - can be sync or async
    * @returns {Promise<any>} - value returned by callback
    */
   public nockBack(
     pathToFixture: string,
-    optionsOverride: NockBackOptions | Function,
+    callbackOrConfig: NockbackExecutionConfig | Function,
     callback?: Function
   ) {
-    if (callback === undefined && typeof optionsOverride === 'function') {
-      callback = optionsOverride
+    validate.string(pathToFixture, 'pathToFixture is mandatory and must be a string')
+    if (callback === undefined && typeof callbackOrConfig === 'function') {
+      callback = callbackOrConfig
+      callbackOrConfig = {}
     }
     if (!callback) {
       throw new Error('No callback defined!')
     }
+    const finalConfig: NockbackExecutionConfig = callbackOrConfig as NockbackExecutionConfig
 
+    const nockConfigOverride: NockBackOptions = finalConfig.nockOptionsOverride || {}
     this._nockBack.fixtures = this.fixtureDirectory!
     this._nockBack.setMode(this.mode)
 
@@ -61,12 +83,12 @@ export class NockbackHelper {
     }
 
     return new Promise((resolve, reject) => {
-      const options = this.passthroughLocalCall ? DEFAULT_OPTIONS : {}
+      const options = this.passThroughLocalCall ? DEFAULT_OPTIONS : {}
       const mergedOptions: NockBackOptions = {
         ...options,
-        ...optionsOverride
+        ...nockConfigOverride
       }
-      if (this.isOverwriting) {
+      if (this.isOverwriting && !finalConfig.doNotOverwrite) {
         deleteFixture(this.fixtureDirectory || '', pathToFixture)
       }
 
