@@ -1,7 +1,11 @@
 # nockback-harder
 
-Wrapper that makes testing using Nock mock replay functionality easier. 
+Wrapper that makes testing using Nock mock record/replay functionality easier. 
 By default does not create mocks for local calls (localhost/127.0.0.1) when recording, allows and passes through local calls when replaying.
+
+  [![NPM Version][npm-image]][npm-url]
+  [![NPM Downloads][downloads-image]][downloads-url]
+  [![Linux Build][travis-image]][travis-url]
 
 ## Install
 
@@ -68,3 +72,10 @@ NockbackHelper provides following helper methods:
 
 * expectNoPendingMocks() -> throw an error if nock instance used by helper still has recorded mocks that were never used during test execution.
 * disableExternalCalls() -> make nock instance used by helper throw an error if external call not covered by existing mocks is made.
+
+[npm-image]: https://img.shields.io/npm/v/nockback-harder.svg
+[npm-url]: https://npmjs.org/package/nockback-harder
+[downloads-image]: https://img.shields.io/npm/dm/nockback-harder.svg
+[downloads-url]: https://npmjs.org/package/nockback-harder
+[travis-image]: https://img.shields.io/travis/kibertoad/nockback-harder/master.svg?label=linux
+[travis-url]: https://travis-ci.org/kibertoad/nockback-harder
