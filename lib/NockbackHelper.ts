@@ -63,6 +63,10 @@ export class NockbackHelper {
     this._nockBack.fixtures = this.fixtureDirectory!
     this._nockBack.setMode(this.mode)
 
+    if (this.isOverwriting && !finalConfig.doNotOverwrite) {
+      deleteFixture(this.fixtureDirectory || '', pathToFixture)
+    }
+
     const hasExternalCalls = checkIfHasExternalCalls(this.fixtureDirectory || '', pathToFixture)
     if (!hasExternalCalls) {
       return this.executeWithoutMocks(callback)
@@ -87,9 +91,6 @@ export class NockbackHelper {
       const mergedOptions: NockBackOptions = {
         ...options,
         ...nockConfigOverride
-      }
-      if (this.isOverwriting && !finalConfig.doNotOverwrite) {
-        deleteFixture(this.fixtureDirectory || '', pathToFixture)
       }
 
       this._nockBack(pathToFixture, mergedOptions, async (nockDone: Function) => {

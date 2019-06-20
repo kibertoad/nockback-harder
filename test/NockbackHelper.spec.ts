@@ -50,6 +50,25 @@ describe('NockbackHelper', () => {
     saveJSON([originalMock], fixturePath)
   })
 
+  it('can overwrite existing empty mocks', async () => {
+    const fixturePath = getFixturePath('local-GET-empty-overwrite.json')
+    const helper = initHelper(__dirname, false)
+    helper.startRecordingOverwrite()
+    const server = runSimpleApp()
+
+    await helper.nockBack('local-GET-empty-overwrite.json', async () => {
+      await request.get('localhost:4000').query({
+        dummy2: 'value'
+      })
+    })
+
+    server.close()
+
+    const [updatedMock] = loadJSON(fixturePath)
+    expect(updatedMock.path).toEqual('/?dummy2=value')
+    saveJSON([], fixturePath)
+  })
+
   it('does not overwrite existing mocks when doNotOverwrite flag is set', async () => {
     const fixturePath = getFixturePath('local-GET-do-not-overwrite.json')
     const helper = initHelper(__dirname, false)
