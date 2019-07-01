@@ -6,6 +6,12 @@ Object {
 }
 `;
 
+exports[`NockbackHelper bypass local when recording on top of empty mocks 1`] = `
+Object {
+  "status": "ok",
+}
+`;
+
 exports[`NockbackHelper bypassing local works with lockdown 1`] = `
 Object {
   "status": "ok",

@@ -151,9 +151,16 @@ export class NockbackHelper {
     })
   }
 
+  public enableAllCalls() {
+    this.nock.enableNetConnect()
+  }
+
   private async executeWithoutMocks(testFn: Function) {
     if (this.mode === 'lockdown') {
       this.disableExternalCalls()
+    }
+    if (this.mode === 'record') {
+      this.enableAllCalls()
     }
     return await testFn()
   }

@@ -112,6 +112,26 @@ describe('NockbackHelper', () => {
     expect(local).toEqual([])
   })
 
+  it('bypass local when recording on top of empty mocks', async () => {
+    const fixturePath = getFixturePath('local-GET-empty-record.json')
+    rimraf.sync(fixturePath)
+    saveJSON([], fixturePath)
+
+    const helper = initHelper(__dirname)
+    helper.startRecording()
+    const server = runSimpleApp()
+
+    await helper.nockBack('local-GET-empty-record.json', async () => {
+      const response = await request.get('localhost:4000')
+      expect(response.body).toMatchSnapshot()
+    })
+
+    server.close()
+
+    const local = loadJSON(getFixturePath('local-GET-empty-record.json'))
+    expect(local).toEqual([])
+  })
+
   it('bypassing local works with lockdown', async () => {
     const helper = initHelper(__dirname)
     helper.startLockdown()
