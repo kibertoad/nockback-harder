@@ -57,6 +57,7 @@ nockBack execution method accepts following parameters:
 NockbackExecutionConfig parameters:
 
 * passthroughLocalCall?: boolean -> override for helper-wide passthrough parameter.
+* passthroughPortWhitelist? number[] -> enable creating and replaying mocks for local calls on specific ports.
 * doNotOverwrite?: boolean -> if set to true, this execution will not overwrite mocks even startRecordingOverwrite() was invoked. Used to preserve manually crafted mocks.
 * nockOptionsOverride?: NockBackOptions -> used to override Nockback options
 

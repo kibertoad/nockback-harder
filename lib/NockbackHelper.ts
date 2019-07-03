@@ -4,11 +4,15 @@ import { NockBack, NockBackMode, NockBackOptions } from 'nock'
 
 const validate = require('validation-utils')
 
+export declare interface PassthroughMatcherConfig {
+  passthroughPortWhitelist?: number[]
+}
+
 export declare interface NockbackHelperConfig {
   passThroughLocalCall: boolean
 }
 
-export declare interface NockbackExecutionConfig {
+export declare interface NockbackExecutionConfig extends PassthroughMatcherConfig {
   passthroughLocalCall?: boolean
   doNotOverwrite?: boolean
   nockOptionsOverride?: NockBackOptions
@@ -69,19 +73,19 @@ export class NockbackHelper {
 
     const hasExternalCalls = checkIfHasExternalCalls(this.fixtureDirectory || '', pathToFixture)
     if (!hasExternalCalls) {
-      return this.executeWithoutMocks(callback)
+      return this.executeWithoutMocks(callback, finalConfig)
     }
 
     const DEFAULT_OPTIONS: NockBackOptions = {
       // on 'lockdown' mode, 'after' is called after lockdown disables all net.
       after: () =>
         this.nock.enableNetConnect({
-          test: localUrlMatcher
+          test: initLocalUrlMatcher(finalConfig)
         }),
       // on 'record' I had to filter requests to localhost.
       afterRecord: (outputs: any[]) => {
         return outputs.filter(o => {
-          return !localUrlMatcher(o.scope)
+          return !initLocalUrlMatcher(finalConfig)(o.scope)
         })
       }
     }
@@ -145,9 +149,9 @@ export class NockbackHelper {
     }
   }
 
-  public disableExternalCalls() {
+  public disableExternalCalls(config: PassthroughMatcherConfig) {
     this.nock.enableNetConnect({
-      test: localUrlMatcher
+      test: initLocalUrlMatcher(config)
     })
   }
 
@@ -155,9 +159,9 @@ export class NockbackHelper {
     this.nock.enableNetConnect()
   }
 
-  private async executeWithoutMocks(testFn: Function) {
+  private async executeWithoutMocks(testFn: Function, config: PassthroughMatcherConfig) {
     if (this.mode === 'lockdown') {
-      this.disableExternalCalls()
+      this.disableExternalCalls(config)
     }
     if (this.mode === 'record') {
       this.enableAllCalls()
@@ -166,11 +170,28 @@ export class NockbackHelper {
   }
 }
 
-function localUrlMatcher(url: string): boolean {
-  if (url.match(/localhost/) || url.match(/127\.0\.0\.1/)) {
-    return true
+function initLocalUrlMatcher(config: PassthroughMatcherConfig) {
+  return (url: string): boolean => {
+    if (url.match(/localhost/) || url.match(/127\.0\.0\.1/)) {
+      if (config.passthroughPortWhitelist) {
+        let isInWhitelist = false
+        config.passthroughPortWhitelist.forEach(port => {
+          const regexString = `:${port.toString()}`
+          const regex = new RegExp(regexString)
+          if (url.match(regex)) {
+            isInWhitelist = true
+          }
+        })
+
+        if (isInWhitelist) {
+          return false
+        }
+      }
+
+      return true
+    }
+    return false
   }
-  return false
 }
 
 /**

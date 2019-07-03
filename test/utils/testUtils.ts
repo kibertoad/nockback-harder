@@ -8,12 +8,12 @@ export function initHelper(dirname: string, passThroughLocalCall: boolean = true
   return new NockbackHelper(nock, dirname + '/nock-fixtures', { passThroughLocalCall })
 }
 
-export function runSimpleApp(): Server {
+export function runSimpleApp(port: number = 4000): Server {
   const app = express()
   app.get('/', (_req: express.Request, res: express.Response) => {
     res.status(200).send({ status: 'ok' })
   })
-  return app.listen(4000)
+  return app.listen(port)
 }
 
 export function loadJSON(path: string): any {

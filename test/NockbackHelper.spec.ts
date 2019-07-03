@@ -112,6 +112,33 @@ describe('NockbackHelper', () => {
     expect(local).toEqual([])
   })
 
+  it('do not bypass local if whitelisted', async () => {
+    rimraf.sync(getFixturePath('local-GET-whitelist.json'))
+    const helper = initHelper(__dirname)
+    helper.startRecordingOverwrite()
+    const server = runSimpleApp()
+    const server2 = runSimpleApp(4001)
+
+    await helper.nockBack(
+      'local-GET-whitelist.json',
+      { passthroughPortWhitelist: [4000] },
+      async () => {
+        const response = await request.get('localhost:4000')
+        expect(response.body).toMatchSnapshot()
+
+        const response2 = await request.get('localhost:4001')
+        expect(response2.body).toMatchSnapshot()
+      }
+    )
+
+    server.close()
+    server2.close()
+
+    const local = loadJSON(getFixturePath('local-GET-whitelist.json'))
+    expect(local.length).toEqual(1)
+    expect(local[0].scope).toEqual('http://localhost:4000')
+  })
+
   it('bypass local when recording on top of empty mocks', async () => {
     const fixturePath = getFixturePath('local-GET-empty-record.json')
     rimraf.sync(fixturePath)
