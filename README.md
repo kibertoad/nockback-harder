@@ -16,11 +16,17 @@ $ npm install --save-dev nockback-harder
 
 ## Example usage
 
+### Basic usage
+
 ```
 import { NockbackHelper } from 'nockback-harder'
 import nock from 'nock'
 
   const helper = new NockbackHelper(nock, __dirname + '/nock-fixtures')
+
+  // This will result in new calls being recorded and previously recorded calls to be replayed. 
+  // It is a good mode for developing (although you might use `startRecordingOverwrite` when calls you are making are changing a lot),
+  // but usually it's a good idea to commit your tests using `startLockdown` mode to ensure no unexpected calls are being made.
   helper.startRecording()
 
   await helper.nockBack('google.com-GET.json', async () => {
@@ -33,6 +39,42 @@ import nock from 'nock'
     const responseLocal = await request.get('localhost:4000')
     expect(responseLocal.status).toBe(200)
     expect(responseLocal.body).toMatchSnapshot()
+  })
+```
+
+### Recording calls to other local services
+
+```
+import { NockbackHelper } from 'nockback-harder'
+import nock from 'nock'
+
+const OTHER_LOCAL_SERVICE_PORT = 8087
+
+  const helper = new NockbackHelper(nock, __dirname + '/nock-fixtures')
+  helper.startRecording()
+
+  await helper.nockBack('google.com-GET.json', { passthroughPortWhitelist: OTHER_LOCAL_SERVICE_PORT] }, async () => {
+    // Local call will not be recorded. But calls from request handler to localhost:8087 will be recorded.
+    const responseLocal = await request.get('localhost:4000')
+    expect(responseLocal.status).toBe(200)
+    expect(responseLocal.body).toMatchSnapshot()
+  })
+```
+
+### Executing tests in CI
+
+```
+import { NockbackHelper } from 'nockback-harder'
+import nock from 'nock'
+
+  const helper = new NockbackHelper(nock, __dirname + '/nock-fixtures')
+  
+  // This will cause test to fail when unexpected calls are being made, instead of recording them. 
+  // This is the mode with which you should be committing your tests.
+  helper.startLockdown()  
+
+  await helper.nockBack('google.com-GET.json', async () => {
+    /* actual test */
   })
 ```
 

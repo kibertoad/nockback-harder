@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { NockBack, NockBackMode, NockBackOptions } from 'nock'
 
-const validate = require('validation-utils')
+import { validationHelper as validate } from 'validation-utils'
 
 export declare interface PassthroughMatcherConfig {
   passthroughPortWhitelist?: number[]

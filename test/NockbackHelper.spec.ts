@@ -137,6 +137,7 @@ describe('NockbackHelper', () => {
     const local = loadJSON(getFixturePath('local-GET-whitelist.json'))
     expect(local.length).toEqual(1)
     expect(local[0].scope).toEqual('http://localhost:4000')
+    rimraf.sync(getFixturePath('local-GET-whitelist.json'))
   })
 
   it('bypass local when recording on top of empty mocks', async () => {
