@@ -118,15 +118,15 @@ export class NockbackHelper {
   }
 
   /**
-   * Use recorded fixtures, record missing ones
+   * Use recorded mocks, record if there are none, throw an error if mocks exist but none of them match request being sent
    */
-  public startRecording() {
+  public startRecordingNew() {
     this.isOverwriting = false
     this.setMode('record')
   }
 
   /**
-   * Record missing fixtures and overwrite existing ones
+   * Delete recorded mocks if they exist, record new mocks
    */
   public startRecordingOverwrite() {
     this.isOverwriting = true
@@ -134,7 +134,7 @@ export class NockbackHelper {
   }
 
   /**
-   * Use recorded fixtures, throw an error on missing ones, don't record
+   * Use recorded mocks, throw an error on missing and unused ones, don't record anything
    */
   public startLockdown() {
     this.isOverwriting = false
