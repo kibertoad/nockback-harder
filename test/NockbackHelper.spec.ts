@@ -29,6 +29,25 @@ describe('NockbackHelper', () => {
     })
   })
 
+  it('replay existing mock but throw on unexpected one', async () => {
+    rimraf.sync(getFixturePath('google.com-GET-append.json'))
+    const helper = initHelper(__dirname)
+    helper.startRecordingNew()
+    await helper.nockBack('google.com-GET-append.json', async () => {
+      await request.get('www.google.com')
+    })
+
+    expect.assertions(1)
+    try {
+      await helper.nockBack('google.com-GET-append.json', async () => {
+        await request.get('www.google.com')
+        await request.get('www.microsoft.com')
+      })
+    } catch (err) {
+      expect(err.message).toMatchSnapshot()
+    }
+  })
+
   it('can overwrite existing mocks', async () => {
     const fixturePath = getFixturePath('local-GET-overwrite.json')
     const helper = initHelper(__dirname, false)
@@ -98,7 +117,7 @@ describe('NockbackHelper', () => {
   it('bypass local', async () => {
     rimraf.sync(getFixturePath('local-GET.json'))
     const helper = initHelper(__dirname)
-    helper.startRecording()
+    helper.startRecordingNew()
     const server = runSimpleApp()
 
     await helper.nockBack('local-GET.json', async () => {
@@ -146,7 +165,7 @@ describe('NockbackHelper', () => {
     saveJSON([], fixturePath)
 
     const helper = initHelper(__dirname)
-    helper.startRecording()
+    helper.startRecordingNew()
     const server = runSimpleApp()
 
     await helper.nockBack('local-GET-empty-record.json', async () => {

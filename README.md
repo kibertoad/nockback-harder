@@ -24,10 +24,10 @@ import nock from 'nock'
 
   const helper = new NockbackHelper(nock, __dirname + '/nock-fixtures')
 
-  // This will result in new calls being recorded and previously recorded calls to be replayed. 
-  // It is a good mode for developing (although you might use `startRecordingOverwrite` when calls you are making are changing a lot),
-  // but usually it's a good idea to commit your tests using `startLockdown` mode to ensure no unexpected calls are being made.
-  helper.startRecording()
+  // This will result in calls being recorded when there are no recorded mocks yet, and mocks being replayed if there are any. 
+  // It is a good mode for development (although you might use `startRecordingOverwrite` when calls you are making are changing a lot),
+  // but you might want to commit code with `startLockdown` mode to ensure no unmocked calls are ever recorded.
+  helper.startRecordingNew()
 
   await helper.nockBack('google.com-GET.json', async () => {
     // External call will be recorded
@@ -51,7 +51,7 @@ import nock from 'nock'
 const OTHER_LOCAL_SERVICE_PORT = 8087
 
   const helper = new NockbackHelper(nock, __dirname + '/nock-fixtures')
-  helper.startRecording()
+  helper.startRecordingNew()
 
   await helper.nockBack('google.com-GET.json', { passthroughPortWhitelist: OTHER_LOCAL_SERVICE_PORT] }, async () => {
     // Local call will not be recorded. But calls from request handler to localhost:8087 will be recorded.
@@ -105,9 +105,9 @@ NockbackExecutionConfig parameters:
 
 ## Supported helper modes
 
-* startRecording() -> Use recorded mocks, record missing ones
-* startRecordingOverwrite() -> Record missing mocks and overwrite existing ones. Meant to be used during development
-* startLockdown() -> Use recorded mocks, throw an error when making a call not covered by existing mocks. Never records anything. Meant to be used for CI
+* startRecordingNew() -> Use recorded mocks, record if there are none, throw an error if mocks exist but none of them match request being sent
+* startRecordingOverwrite() -> Delete recorded mocks if they exist, record new mocks
+* startLockdown() -> Use recorded mocks, throw an error on missing and unused ones. Never records anything. Meant to be used for CI
 
 ## Helper methods
 
