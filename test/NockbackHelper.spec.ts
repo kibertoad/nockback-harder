@@ -46,6 +46,7 @@ describe('NockbackHelper', () => {
     } catch (err) {
       expect(err.message).toMatchSnapshot()
     }
+    rimraf.sync(getFixturePath('google.com-GET-append.json'))
   })
 
   it('can overwrite existing mocks', async () => {

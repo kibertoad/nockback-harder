@@ -1,9 +1,6 @@
-# .travis.yml
 language: node_js
-dist: xenial
 
 node_js:
-  - '6'
   - '8'
   - '10'
   - '12'

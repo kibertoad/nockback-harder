@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import { NockBack, NockBackMode, NockBackOptions } from 'nock'
+import { Back, BackMode, BackOptions } from 'nock'
 
 import { validationHelper as validate } from 'validation-utils'
 
@@ -15,14 +15,14 @@ export declare interface NockbackHelperConfig {
 export declare interface NockbackExecutionConfig extends PassthroughMatcherConfig {
   passthroughLocalCall?: boolean
   doNotOverwrite?: boolean
-  nockOptionsOverride?: NockBackOptions
+  nockOptionsOverride?: BackOptions
 }
 
 export class NockbackHelper {
   private readonly nock: any
-  private readonly _nockBack: NockBack
+  private readonly _nockBack: Back
   private isOverwriting: boolean
-  private mode: NockBackMode
+  private mode: BackMode
   private fixtureDirectory: string | undefined
   private readonly passThroughLocalCall: boolean
 
@@ -63,7 +63,7 @@ export class NockbackHelper {
     }
     const finalConfig: NockbackExecutionConfig = callbackOrConfig as NockbackExecutionConfig
 
-    const nockConfigOverride: NockBackOptions = finalConfig.nockOptionsOverride || {}
+    const nockConfigOverride: BackOptions = finalConfig.nockOptionsOverride || {}
     this._nockBack.fixtures = this.fixtureDirectory!
     this._nockBack.setMode(this.mode)
 
@@ -76,7 +76,7 @@ export class NockbackHelper {
       return this.executeWithoutMocks(callback, finalConfig)
     }
 
-    const DEFAULT_OPTIONS: NockBackOptions = {
+    const DEFAULT_OPTIONS: BackOptions = {
       // on 'lockdown' mode, 'after' is called after lockdown disables all net.
       after: () =>
         this.nock.enableNetConnect({
@@ -92,7 +92,7 @@ export class NockbackHelper {
 
     return new Promise((resolve, reject) => {
       const options = this.passThroughLocalCall ? DEFAULT_OPTIONS : {}
-      const mergedOptions: NockBackOptions = {
+      const mergedOptions: BackOptions = {
         ...options,
         ...nockConfigOverride
       }
@@ -113,7 +113,7 @@ export class NockbackHelper {
     this.fixtureDirectory = fixtureDirectory
   }
 
-  public setMode(mode: NockBackMode) {
+  public setMode(mode: BackMode) {
     this.mode = mode
   }
 
