@@ -78,10 +78,7 @@ export class NockbackHelper {
 
     const DEFAULT_OPTIONS: BackOptions = {
       // on 'lockdown' mode, 'after' is called after lockdown disables all net.
-      after: () =>
-        this.nock.enableNetConnect({
-          test: initLocalUrlMatcher(finalConfig)
-        }),
+      after: () => this.nock.enableNetConnect(initLocalUrlMatcher(finalConfig)),
       // on 'record' I had to filter requests to localhost.
       afterRecord: (outputs: any[]) => {
         return outputs.filter(o => {
@@ -150,9 +147,7 @@ export class NockbackHelper {
   }
 
   public disableExternalCalls(config: PassthroughMatcherConfig) {
-    this.nock.enableNetConnect({
-      test: initLocalUrlMatcher(config)
-    })
+    this.nock.enableNetConnect(initLocalUrlMatcher(config))
   }
 
   public enableAllCalls() {
