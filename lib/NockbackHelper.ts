@@ -18,6 +18,8 @@ export declare interface NockbackExecutionConfig extends PassthroughMatcherConfi
   nockOptionsOverride?: BackOptions
 }
 
+export declare type CallbackFunction = () => void | Promise<any>
+
 export class NockbackHelper {
   private readonly nock: any
   private readonly _nockBack: Back
@@ -30,7 +32,7 @@ export class NockbackHelper {
     nock: any,
     fixtureDirectory?: string,
     config: NockbackHelperConfig = {
-      passThroughLocalCall: true
+      passThroughLocalCall: true,
     }
   ) {
     this.nock = nock
@@ -50,8 +52,8 @@ export class NockbackHelper {
    */
   public nockBack(
     pathToFixture: string,
-    callbackOrConfig: NockbackExecutionConfig | Function,
-    callback?: Function
+    callbackOrConfig: NockbackExecutionConfig | CallbackFunction,
+    callback?: CallbackFunction
   ) {
     validate.string(pathToFixture, 'pathToFixture is mandatory and must be a string')
     if (callback === undefined && typeof callbackOrConfig === 'function') {
@@ -81,20 +83,20 @@ export class NockbackHelper {
       after: () => this.nock.enableNetConnect(initLocalUrlMatcher(finalConfig)),
       // on 'record' I had to filter requests to localhost.
       afterRecord: (outputs: any[]) => {
-        return outputs.filter(o => {
+        return outputs.filter((o) => {
           return !initLocalUrlMatcher(finalConfig)(o.scope)
         })
-      }
+      },
     }
 
     return new Promise((resolve, reject) => {
       const options = this.passThroughLocalCall ? DEFAULT_OPTIONS : {}
       const mergedOptions: BackOptions = {
         ...options,
-        ...nockConfigOverride
+        ...nockConfigOverride,
       }
 
-      this._nockBack(pathToFixture, mergedOptions, async (nockDone: Function) => {
+      this._nockBack(pathToFixture, mergedOptions, async (nockDone: () => void) => {
         try {
           const result = await callback!()
           nockDone()
@@ -154,14 +156,14 @@ export class NockbackHelper {
     this.nock.enableNetConnect()
   }
 
-  private async executeWithoutMocks(testFn: Function, config: PassthroughMatcherConfig) {
+  private async executeWithoutMocks(testFn: CallbackFunction, config: PassthroughMatcherConfig) {
     if (this.mode === 'lockdown') {
       this.disableExternalCalls(config)
     }
     if (this.mode === 'record') {
       this.enableAllCalls()
     }
-    return await testFn()
+    return testFn()
   }
 }
 
@@ -170,7 +172,7 @@ function initLocalUrlMatcher(config: PassthroughMatcherConfig) {
     if (url.match(/localhost/) || url.match(/127\.0\.0\.1/)) {
       if (config.passthroughPortWhitelist) {
         let isInWhitelist = false
-        config.passthroughPortWhitelist.forEach(port => {
+        config.passthroughPortWhitelist.forEach((port) => {
           const regexString = `:${port.toString()}`
           const regex = new RegExp(regexString)
           if (url.match(regex)) {

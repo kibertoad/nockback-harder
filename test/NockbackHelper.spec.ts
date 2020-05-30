@@ -59,7 +59,7 @@ describe('NockbackHelper', () => {
 
     await helper.nockBack('local-GET-overwrite.json', async () => {
       await request.get('localhost:4000').query({
-        dummy2: 'value'
+        dummy2: 'value',
       })
     })
 
@@ -78,7 +78,7 @@ describe('NockbackHelper', () => {
 
     await helper.nockBack('local-GET-empty-overwrite.json', async () => {
       await request.get('localhost:4000').query({
-        dummy2: 'value'
+        dummy2: 'value',
       })
     })
 
@@ -101,7 +101,7 @@ describe('NockbackHelper', () => {
     await helper.nockBack('local-GET-do-not-overwrite.json', { doNotOverwrite: true }, async () => {
       try {
         await request.get('localhost:4000').query({
-          dummy2: 'value'
+          dummy2: 'value',
         })
       } catch (err) {
         expect(err.message).toMatch('No match for request')
