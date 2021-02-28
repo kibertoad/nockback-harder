@@ -2,11 +2,11 @@ import { NockbackHelper } from '../../lib/NockbackHelper'
 import express from 'express'
 import * as nock from 'nock'
 import { Server } from 'net'
-import { readFileSync, writeFileSync, rmSync as fsRmSync, existsSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync, unlinkSync } from 'fs'
 
-export function rmSync(rmPath: string) {
+export function rmSyncRecursive(rmPath: string) {
   if (existsSync(rmPath)) {
-    fsRmSync(rmPath, { recursive: true })
+    unlinkSync(rmPath)
   }
 }
 

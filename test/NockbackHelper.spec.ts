@@ -1,6 +1,6 @@
 import request from 'superagent'
 import express from 'express'
-import { rmSync, initHelper, runSimpleApp, loadJSON, saveJSON } from './utils/testUtils'
+import { rmSyncRecursive, initHelper, runSimpleApp, loadJSON, saveJSON } from './utils/testUtils'
 
 describe('NockbackHelper', () => {
   it('block unmocked external call', async () => {
@@ -29,7 +29,7 @@ describe('NockbackHelper', () => {
   })
 
   it('replay existing mock but throw on unexpected one', async () => {
-    rmSync(getFixturePath('google.com-GET-append.json'))
+    rmSyncRecursive(getFixturePath('google.com-GET-append.json'))
     const helper = initHelper(__dirname)
     helper.startRecordingNew()
     await helper.nockBack('google.com-GET-append.json', async () => {
@@ -45,7 +45,7 @@ describe('NockbackHelper', () => {
     } catch (err) {
       expect(err.message).toMatchSnapshot()
     }
-    rmSync(getFixturePath('google.com-GET-append.json'))
+    rmSyncRecursive(getFixturePath('google.com-GET-append.json'))
   })
 
   it('can overwrite existing mocks', async () => {
@@ -115,7 +115,7 @@ describe('NockbackHelper', () => {
   })
 
   it('bypass local', async () => {
-    rmSync(getFixturePath('local-GET.json'))
+    rmSyncRecursive(getFixturePath('local-GET.json'))
     const helper = initHelper(__dirname)
     helper.startRecordingNew()
     const server = runSimpleApp()
@@ -132,7 +132,7 @@ describe('NockbackHelper', () => {
   })
 
   it('do not bypass local if whitelisted', async () => {
-    rmSync(getFixturePath('local-GET-whitelist.json'))
+    rmSyncRecursive(getFixturePath('local-GET-whitelist.json'))
     const helper = initHelper(__dirname)
     helper.startRecordingOverwrite()
     const server = runSimpleApp()
@@ -156,12 +156,12 @@ describe('NockbackHelper', () => {
     const local = loadJSON(getFixturePath('local-GET-whitelist.json'))
     expect(local.length).toEqual(1)
     expect(local[0].scope).toEqual('http://localhost:4000')
-    rmSync(getFixturePath('local-GET-whitelist.json'))
+    rmSyncRecursive(getFixturePath('local-GET-whitelist.json'))
   })
 
   it('bypass local when recording on top of empty mocks', async () => {
     const fixturePath = getFixturePath('local-GET-empty-record.json')
-    rmSync(fixturePath)
+    rmSyncRecursive(fixturePath)
     saveJSON([], fixturePath)
 
     const helper = initHelper(__dirname)
