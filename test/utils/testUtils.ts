@@ -2,7 +2,13 @@ import { NockbackHelper } from '../../lib/NockbackHelper'
 import express from 'express'
 import * as nock from 'nock'
 import { Server } from 'net'
-import fs from 'fs'
+import { readFileSync, writeFileSync, existsSync, unlinkSync } from 'fs'
+
+export function rmSyncRecursive(rmPath: string) {
+  if (existsSync(rmPath)) {
+    unlinkSync(rmPath)
+  }
+}
 
 export function initHelper(dirname: string, passThroughLocalCall = true): NockbackHelper {
   return new NockbackHelper(nock, dirname + '/nock-fixtures', { passThroughLocalCall })
@@ -17,9 +23,9 @@ export function runSimpleApp(port = 4000): Server {
 }
 
 export function loadJSON(path: string): any {
-  return JSON.parse(fs.readFileSync(path, 'utf8'))
+  return JSON.parse(readFileSync(path, 'utf8'))
 }
 
 export function saveJSON(json: any, path: string): any {
-  fs.writeFileSync(path, JSON.stringify(json), 'utf8')
+  writeFileSync(path, JSON.stringify(json), 'utf8')
 }

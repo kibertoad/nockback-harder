@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { Back, BackMode, BackOptions } from 'nock'
 
-import { validationHelper as validate } from 'validation-utils'
+import { validateNotNil, validateString } from 'validation-utils'
 
 export declare interface PassthroughMatcherConfig {
   passthroughPortWhitelist?: number[]
@@ -36,7 +36,7 @@ export class NockbackHelper {
     }
   ) {
     this.nock = nock
-    this._nockBack = validate.notNil(nock.back, 'Please pass nock as first parameter')
+    this._nockBack = validateNotNil(nock.back, 'Please pass nock as first parameter')
     this.mode = 'record'
     this.isOverwriting = false
     this.fixtureDirectory = fixtureDirectory
@@ -55,7 +55,7 @@ export class NockbackHelper {
     callbackOrConfig: NockbackExecutionConfig | CallbackFunction,
     callback?: CallbackFunction
   ) {
-    validate.string(pathToFixture, 'pathToFixture is mandatory and must be a string')
+    validateString(pathToFixture, 'pathToFixture is mandatory and must be a string')
     if (callback === undefined && typeof callbackOrConfig === 'function') {
       callback = callbackOrConfig
       callbackOrConfig = {}
